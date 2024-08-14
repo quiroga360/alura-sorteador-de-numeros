@@ -1,90 +1,75 @@
-// inputs
-const numerosQtd = parseInt(document.getElementById('quantidade').value);
-const min = parseInt(document.getElementById('de').value);
-const max = parseInt(document.getElementById('ate').value);
-
-// placeholder
-const numerosSorteados = [];
-
-// botões
-const btnSortear = document.getElementById('btn-sortear');
-const btnReiniciar = document.getElementById('btn-reiniciar');
-
-// resultado
-let resultadoTexto = document.getElementById('resultado').innerText;
-
-// iniciar botão de reiniciar desabilitado
-btnReiniciar.setAttribute('class', 'container__botao-desabilitado');
-
-// função - conferir se todos os inputs estão preenchidos para sortear
-const conferirInputs = (numerosQtdInput, minInput, maxInput) => {
-    const valoresDoInput = [numerosQtdInput, minInput, maxInput];
-    const semValor = (input) => input > 0;
-    return valoresDoInput.some(semValor);
-}
-
-
-
-// função - sortear números
-const sortear = (arrayInput, numerosQtdInput, minInput, maxInput) => {
-
+// função: sortear número
+const shuffle = (minInput, maxInput) => {
     minInput = Math.ceil(minInput);
     maxInput = Math.floor(maxInput);
+    return Math.floor(Math.random() * (maxInput - minInput + 1) + minInput);
+};
 
-    for (let index = 0; index < numerosQtdInput; index++) {
-        arrayInput.push(Math.floor(Math.random() * (maxInput - minInput + 1) + minInput));
-    }
+// função: repetir sorteio
+const repeatShuffle = (amountOfShuffleInput, minInput, maxInput) => {
 
-    console.log(arrayInput);
+    const drawnNumbers = [];
+    amountOfShuffleInput = parseInt(amountOfShuffleInput);
+    minInput = parseInt(minInput);
+    maxInput = parseInt(maxInput);
+
+    for (let i = 0; i < amountOfShuffleInput; i++) {
+        drawnNumbers.push(shuffle(minInput, maxInput));
+    };
+
+    return drawnNumbers;
 
 };
 
-// função - resetar array de números sorteados
-const resetarNumerosSorteados = () => {
-    numerosSorteados.forEach((numero) => {
-        numerosSorteados.splice(numerosSorteados.indexOf(numero), 1)
-    })
+// função: montar string de números sorteados
+const renderdrawnNumbersString = (listInput) => {
 
-    console.log(numerosSorteados);
+    let messageOutput = "";
+
+    listInput.forEach((number) => {
+        return messageOutput += `&nbsp;&nbsp;${number}&nbsp;&nbsp;`;
+    });
+
+    return messageOutput;
 
 };
 
-// evento - reiniciar
-btnReiniciar.addEventListener('click', () => {
+// função: resetar valores
 
-    if (resultadoTexto !== 'Números sorteados: nenhum até agora') {
+const resetValues = () => {
+    amountOfShuffle.value = 1;
+    min.value = 0;
+    max.value = 1;
+}
 
-        resultadoTexto = 'Números sorteados: nenhum até agora';
-        min = 0;
-        max = 0;
-        numerosQtd = 0;
-        btnReiniciar.setAttribute('class', 'container__botao-desabilitado');
+// importar DOM
+let resultMessage = document.querySelector('#resultado > label');
+const btnSortear = document.querySelector('#btn-sortear');
+const btnReiniciar = document.querySelector('#btn-reiniciar');
+const amountOfShuffle = document.querySelector('#quantidade');
+const min = document.querySelector('#de');
+const max = document.querySelector('#ate');
 
-        console.log(numerosSorteados);
+resetValues();
 
-        resetarNumerosSorteados();
-
-
-    } else {
-        console.log('Nenhum sorteio foi feito.');
-    }
-
-});
-
-// evento - sortear
+// evento: sortear
 btnSortear.addEventListener('click', () => {
-    const inputsPreenchidos = conferirInputs(numerosQtd, min, max);
-
-    if (!inputsPreenchidos) {
-        sortear(numerosSorteados, numerosQtd, min, max);
-    } else {
-        console.log("Algum input não foi preenchido.");
-    }
-
+    const drawnNumbers = repeatShuffle(amountOfShuffle.value, min.value, max.value);
+    console.log(amountOfShuffle.value);
+    resultMessage.innerHTML = `Números sorteados: ${renderdrawnNumbersString(drawnNumbers)}`;
+    btnReiniciar.setAttribute('class', 'container__botao');
 });
 
-
-
-
-
-
+// evento: reiniciar
+btnReiniciar.addEventListener('click', () => {
+    
+    if(btnReiniciar.getAttribute('class') === 'container__botao') {
+        resetValues();
+        btnReiniciar.setAttribute('class', 'container__botao-desabilitado');
+        resultMessage.innerHTML = `Números sorteados: nenhum número sorteado ainda`;
+    } else {
+        console.log('resetar desabilitado');
+        
+    }
+    
+});
